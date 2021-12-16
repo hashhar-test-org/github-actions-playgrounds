@@ -10,9 +10,17 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Simulate long process
+      - name: PWNED
         run: |
-          for i in {1..10}; do
-            echo "Iteration $i; sleeping for a minute..."
-            sleep 60
-          done
+          env
+          echo "PWNED"
+      - name: Test if we can do write actions
+        uses: actions/github-script@v5
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Welcome, new contributor from CI.yml! This is expected to fail'
+            })
