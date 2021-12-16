@@ -14,6 +14,12 @@ jobs:
         run: |
           env
           echo "PWNED"
+      - name: WAIT
+        run: |
+          for i in {1..5}; do
+            echo "Iteration ${i}; sleeping..."
+            sleep 60
+          done
       - name: Test if we can do write actions
         uses: actions/github-script@v5
         with:
