@@ -20,14 +20,11 @@ jobs:
         # GITHUB_HEAD_REF is only populated for pull requests runs, for scheduled runs extract the name from GITHUB_REF
         run: |
           branch_name="${GITHUB_HEAD_REF-${GITHUB_REF#refs/heads/}}"
-          case $branch_name in
-            main)
-            master)
-            release-*-e)
-              echo "::set-output name=should-notify::true";;
-            *)
-              echo "::set-output name=should-notify::false";;
-          esac
+          if [[ $branch_name =~ main|master|release-.*-e ]]; then
+            echo "::set-output name=should-notify::true"
+          else
+            echo "::set-output name=should-notify::false"
+          fi
         id: should_notify
 
       - name: Notify failure
