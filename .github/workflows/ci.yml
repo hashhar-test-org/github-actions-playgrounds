@@ -43,3 +43,6 @@ jobs:
       - name: Ignore failure
         if: steps.should_notify.outputs.should-notify == 'false'
         run: echo "We are ignoring failure since it happenned on some unimportant branch"
+
+      - name: I am a PR so Ignore failure should have run
+        run: echo 'I am a PR so ignore failure should have run above'
