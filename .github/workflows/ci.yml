@@ -2,17 +2,26 @@ name: ci
 
 on:
   push:
-    branches:
-      - main
   pull_request:
+  schedule:
+    - cron: "*/15 * * * *"
 
 jobs:
-  ci:
+  dump_contexts_to_log:
     runs-on: ubuntu-latest
     steps:
-      - name: Simulate long process
-        run: |
-          for i in {1..10}; do
-            echo "Iteration $i; sleeping for a minute..."
-            sleep 60
-          done
+      - name: Dump GitHub context
+        id: github_context_step
+        run: echo '${{ toJSON(github) }}'
+      - name: Dump job context
+        run: echo '${{ toJSON(job) }}'
+      - name: Dump steps context
+        run: echo '${{ toJSON(steps) }}'
+      - name: Dump runner context
+        run: echo '${{ toJSON(runner) }}'
+      - name: Dump strategy context
+        run: echo '${{ toJSON(strategy) }}'
+      - name: Dump matrix context
+        run: echo '${{ toJSON(matrix) }}'
+      - name: Dump env vars
+        run: env
