@@ -31,7 +31,8 @@ jobs:
         id: should_notify
 
       - name: Inspect output
-        run: echo 'Output was: ${{ steps.should_notify.outputs.should_notify }}'
+        run: |
+          echo 'Output was: ${{ steps.should_notify.outputs.should_notify }}'
 
       - name: Notify failure
         if: steps.should_notify.outputs.should_notify == 'true'
