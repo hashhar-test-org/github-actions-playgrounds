@@ -10,20 +10,32 @@ jobs:
   dump_contexts_to_log:
     runs-on: ubuntu-latest
     steps:
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
-      - name: Dump env vars
-        run: env
-      - name: I am a PULL
-        run: echo 'I am a PULL'
+      - name: Branch name from which job was triggerred
+        run: |
+          echo "For PRs - github.head_ref: ${{ github.head_ref }}; via env var $GITHUB_HEAD_REF"
+          echo "For branches/scheduled runs - github.ref_name: ${{ github.ref_name }}; via env var $GITHUB_REF_NAME"
+          echo "For branches/scheduled runs with some expansion needed - github.ref: ${{ github.ref }}; via env var ${GITHUB_REF} - which becomes ${GITHUB_REF#refs/heads/} after trimming"
+
+      - name: Should we notify
+        # GITHUB_HEAD_REF is only populated for pull requests runs, for scheduled runs extract the name from GITHUB_REF
+        run: |
+          branch_name="${GITHUB_HEAD_REF-${GITHUB_REF#refs/heads/}}"
+          case $branch_name in
+            main)
+            master)
+            release-*-e)
+              echo "::set-output name=should-notify::true";;
+            *)
+              echo "::set-output name=should-notify::false";;
+          esac
+        id: should_notify
+
+      - name: Notify failure
+        if: steps.should_notify.outputs.should_notify == 'true'
+        run: |
+          echo "We are notifying that a failure happenned"
+      
+      - name: Ignore failure
+        if: steps.should_notify.outputs.should_notify == 'false'
+        run: |
+          echo "We are ignoring failure since it happenned on some unimportant branch"
