@@ -23,7 +23,7 @@ jobs:
       - name: Should we notify
         # GITHUB_HEAD_REF is only populated for pull requests runs, for scheduled runs extract the name from GITHUB_REF
         run: |
-          branch_name="${GITHUB_HEAD_REF-${GITHUB_REF#refs/heads/}}"
+          branch_name="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           echo $branch_name
           if [[ $branch_name =~ main|master|release-.*-e ]]; then
             echo "::set-output name=should-notify::true"
