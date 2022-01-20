@@ -12,27 +12,31 @@ jobs:
     steps:
       - name: Branch name from which job was triggerred
         run: |
-          echo "For PRs - github.head_ref: ${{ github.head_ref }}; via env var $GITHUB_HEAD_REF"
-          echo "For branches/scheduled runs - github.ref_name: ${{ github.ref_name }}; via env var $GITHUB_REF_NAME"
-          echo "For branches/scheduled runs with some expansion needed - github.ref: ${{ github.ref }}; via env var ${GITHUB_REF} - which becomes ${GITHUB_REF#refs/heads/} after trimming"
+          echo "For PRs - github.head_ref: ${{ github.head_ref }}; via env var: $GITHUB_HEAD_REF"
+          echo "For branches/scheduled runs - github.ref_name: ${{ github.ref_name }}; via env var: $GITHUB_REF_NAME"
+          echo "For branches/scheduled runs with some expansion needed - github.ref: ${{ github.ref }}; via env var: ${GITHUB_REF} - which after trimming becomes: ${GITHUB_REF#refs/heads/}"
 
       - name: Should we notify
         # GITHUB_HEAD_REF is only populated for pull requests runs, for scheduled runs extract the name from GITHUB_REF
         run: |
           branch_name="${GITHUB_HEAD_REF-${GITHUB_REF#refs/heads/}}"
+          echo $branch_name
           if [[ $branch_name =~ main|master|release-.*-e ]]; then
             echo "::set-output name=should-notify::true"
+            echo "will notify"
           else
             echo "::set-output name=should-notify::false"
+            echo "will not notify"
           fi
         id: should_notify
 
+      - name: Inspect output
+        run: echo 'Output was: ${{ steps.should_notify.outputs.should_notify }}'
+
       - name: Notify failure
         if: steps.should_notify.outputs.should_notify == 'true'
-        run: |
-          echo "We are notifying that a failure happenned"
+        run: echo "We are notifying that a failure happenned"
       
       - name: Ignore failure
         if: steps.should_notify.outputs.should_notify == 'false'
-        run: |
-          echo "We are ignoring failure since it happenned on some unimportant branch"
+        run: echo "We are ignoring failure since it happenned on some unimportant branch"
