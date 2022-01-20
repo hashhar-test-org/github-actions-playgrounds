@@ -10,6 +10,10 @@ jobs:
   dump_contexts_to_log:
     runs-on: ubuntu-latest
     steps:
+      - name: Log inputs
+        run: |
+          env | grep 'GITHUB_'
+
       - name: Branch name from which job was triggerred
         run: |
           echo "For PRs - github.head_ref: ${{ github.head_ref }}; via env var: $GITHUB_HEAD_REF"
