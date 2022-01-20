@@ -25,3 +25,5 @@ jobs:
         run: echo '${{ toJSON(matrix) }}'
       - name: Dump env vars
         run: env
+      - name: I am a PULL
+        run: echo 'I am a PULL'
